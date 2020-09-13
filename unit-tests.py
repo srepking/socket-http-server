@@ -5,6 +5,7 @@ import http_server
 
 class TestCase(unittest.TestCase):
 
+    #@unittest.skip("Skipping")
     def test_response_ok(self):
         mimetype = b"image/bmp"
         body = b"foo"
@@ -53,8 +54,20 @@ class TestCase(unittest.TestCase):
         content, mime_type = http_server.response_path(path)
 
         self.assertEqual(b"text/html", mime_type)
-        
+
         with open(os.path.join("webroot", "a_web_page.html"), "rb") as f:
+            self.assertEqual(f.read(), content)
+
+    def test_response_path_image(self):
+        file = 'images/Sample_Scene_Balls.jpg'
+        web_path = '/' + file
+
+        content, mime_type = http_server.response_path(web_path)
+
+
+        self.assertEqual(b"image/jpeg", mime_type)
+
+        with open(os.path.join("webroot", file), "rb") as f:
             self.assertEqual(f.read(), content)
 
     def test_response_path_dir(self):
@@ -66,6 +79,19 @@ class TestCase(unittest.TestCase):
         self.assertIn(b"make_time.py", content)
         self.assertIn(b"sample.txt", content)
         self.assertIn(b"a_web_page.html", content)
+
+    def test_images_index(self):
+        """
+        A call to /images/ yields a list of files in the images directory
+        """
+
+        path = "/images"
+
+        content, mime_type = http_server.response_path(path)
+
+        self.assertIn(b"JPEG_example.jpg", content)
+        self.assertIn(b"sample_1.png", content)
+        self.assertIn(b"Sample_Scene_Balls.jpg", content)
 
     def test_response_path_not_found(self):
         path = "/foo/bar/baz/doesnt/exist"

@@ -2,6 +2,7 @@ import unittest
 import subprocess
 import http.client
 import os
+import logging
 
 
 class WebTestCase(unittest.TestCase):
